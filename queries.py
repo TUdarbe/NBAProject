@@ -180,6 +180,21 @@ def team_stats(team, year, data_format):
     writer.save()
 
 
+def team_opp_stats(team, year, data_format):
+    team_dfs = []
+    sheets = []
+
+    print("Saving into excel sheet... ")
+    writer = ExcelWriter("./Excel-Sheets/%s-%d_OPP-STATS_%s.xlsx" % (team, year, data_format))
+    team_dfs.append(get_team_stats(team, year, data_format).reset_index().transpose())
+    sheets.append(team)
+
+    for df, sheet in zip(team_dfs, sheets):
+        df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=False)
+
+    writer.save()
+
+
 def roster_list(team, year):
     team_dfs = []
     sheets = []
@@ -231,7 +246,7 @@ def user_input():
                 print(get_roster(user_team, user_season))
 
         elif user_stats is '2':
-            data_format = input("Enter data format: (TOTAL | PER_GAME | PER_POSS |): ")
+            data_format = input("Enter data format: (TOTAL | PER_GAME | PER_POSS): ")
 
             if print_or_excel is 'Y' or 'y':
                 team_stats(user_team, user_season, data_format)
@@ -239,3 +254,13 @@ def user_input():
 
             elif print_or_excel is 'N' or 'n':
                 print(get_team_stats(user_team, user_season, data_format))
+
+        elif user_stats is '3':
+            data_format = input("Enter data format: (TOTAL | PER_GAME | PER_POSS): ")
+
+            if print_or_excel is 'Y' or 'y':
+                team_opp_stats(user_team, user_season, data_format)
+                print(get_opp_stats(user_team, user_season, data_format))
+
+            elif print_or_excel is 'N' or 'n':
+                print(get_opp_stats(user_team, user_season, data_format))
