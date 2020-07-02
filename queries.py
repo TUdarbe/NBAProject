@@ -1,14 +1,13 @@
-
 import psycopg2
 from nba_api.stats.static import players
 from connect import config
 from TEAM_ABBR import TEAM_TO_TEAM_ABBR, TEAM_ABV_DICTIONARY
-from basketball_reference_scraper.teams import get_team_stats, get_team_misc
+from basketball_reference_scraper.teams import get_team_stats, get_team_misc, get_roster, get_roster_stats, get_opp_stats
 from pandas import ExcelWriter
 
-#Function if I want to create tables for database, right now putting data into excel sheets
-def create_tables():
 
+# Function if I want to create tables for database, right now putting data into excel sheets
+def create_tables():
     queries = (
         """
                CREATE TABLE if not exists teams (
@@ -106,7 +105,6 @@ def insert_teams():
 
 
 def insert_players():
-
     conn = None
     player_list = players.get_active_players()
     try:
@@ -130,7 +128,8 @@ def insert_players():
 def insert_stats(year):
     team_dfs = []
     sheets = []
-    writer = ExcelWriter("NBA-%d_PerGameStats.xlsx" % year)
+
+    writer = ExcelWriter("./Excel-Sheets/NBA-%d_PerGameStats.xlsx" % year)
 
     # for t, a in TEAM_TO_TEAM_ABBR.items():
     #     team_dfs.append(get_team_stats(a, year, 'PER_GAME'))
@@ -144,34 +143,50 @@ def insert_stats(year):
 
     writer.save()
 
-#queries needed if I want to put into a database ex.PostGres
-    # try:
-    #     params = config()
-    #     conn = psycopg2.connect(**params)
-    #     cur = conn.cursor()
-    #     cur.executemany("""INSERT INTO team_stats_per_game VALUES
-    #                            (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s,
-    #                           %s, %s, %s, %s, %s, %s, %s,
-    #                            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-    #                     teams_dfs)
-    #     conn.commit()
-    #     cur.close()
-    #     print('Finished inserting data')
-    #
-    # except (Exception, psycopg2.DatabaseError) as error:
-    #     print(error)
-    # finally:
-    #     if conn is not None:
-    #         conn.close()
+
+# queries needed if I want to put into a database ex.PostGres
+# try:
+#     params = config()
+#     conn = psycopg2.connect(**params)
+#     cur = conn.cursor()
+#     cur.executemany("""INSERT INTO team_stats_per_game VALUES
+#                            (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s,
+#                           %s, %s, %s, %s, %s, %s, %s,
+#                            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+#                     teams_dfs)
+#     conn.commit()
+#     cur.close()
+#     print('Finished inserting data')
+#
+# except (Exception, psycopg2.DatabaseError) as error:
+#     print(error)
+# finally:
+#     if conn is not None:
+#         conn.close()
 
 
-def team_stats(team, year):
+def team_stats(team, year, data_format):
     team_dfs = []
     sheets = []
 
-    print("Getting stats for " + team)
-    writer = ExcelWriter("%s-%d_PerGameStats.xlsx" % (team,year))
-    team_dfs.append(get_team_stats(team, year, 'PER_GAME').reset_index().transpose())
+    print("Saving into excel sheet... ")
+    writer = ExcelWriter("./Excel-Sheets/%s-%d_%s.xlsx" % (team, year, data_format))
+    team_dfs.append(get_team_stats(team, year, data_format).reset_index().transpose())
+    sheets.append(team)
+
+    for df, sheet in zip(team_dfs, sheets):
+        df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=False)
+
+    writer.save()
+
+
+def roster_list(team, year):
+    team_dfs = []
+    sheets = []
+
+    print("Saving into excel sheet... ")
+    writer = ExcelWriter("./Excel-Sheets/%s-%d_Roster.xlsx" % (team, year))
+    team_dfs.append(get_roster(team, year).reset_index().transpose())
     sheets.append(team)
 
     for df, sheet in zip(team_dfs, sheets):
@@ -192,3 +207,35 @@ def team_stats_adv(team, year):
         df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=False)
 
     writer.save()
+
+
+def user_input():
+    team_or_player = input("What stats would you like to see: (1)Team or (2)Player ")
+
+    if team_or_player is '1':
+        user_team = input("What team would you like to view? ")
+        user_season = int(input("Enter the desired season: "))
+
+        user_stats = input("Enter the number for what stat you would like to see: \n1.) Roster List\n"
+                           "2.) Team Stats\n"
+                           "3.) Team Opponent Stats\n"
+                           "4.) Roster Stats\n"
+                           "5.) Misc Stats\n")
+        print_or_excel = input("Would you like to save information in an excel sheet (Y/N)? ")
+        if user_stats is '1':
+            if print_or_excel is 'Y' or 'y':
+                roster_list(user_team, user_season)
+                print(get_roster(user_team, user_season))
+            elif print_or_excel is 'N' or 'n':
+
+                print(get_roster(user_team, user_season))
+
+        elif user_stats is '2':
+            data_format = input("Enter data format: (TOTAL | PER_GAME | PER_POSS |): ")
+
+            if print_or_excel is 'Y' or 'y':
+                team_stats(user_team, user_season, data_format)
+                print(get_team_stats(user_team, user_season, data_format))
+
+            elif print_or_excel is 'N' or 'n':
+                print(get_team_stats(user_team, user_season, data_format))

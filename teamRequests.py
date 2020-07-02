@@ -1,7 +1,7 @@
 from basketball_reference_scraper.teams import get_team_stats
 from TEAM_ABBR import TEAM_TO_TEAM_ABBR
 import connect as conn
-from queries import create_tables, insert_teams, insert_stats, team_stats, team_stats_adv
+from queries import create_tables, insert_teams, insert_stats, team_stats, team_stats_adv, user_input
 from nba_api.stats.static import teams
 import json
 
@@ -22,7 +22,5 @@ team_list = []
 # writer.save()
 #
 # create_tables()
-insert_stats(2019)
-insert_stats(2018)
-team_stats('TOR', 2019)
-team_stats_adv('TOR', 2019)
+
+user_input()
