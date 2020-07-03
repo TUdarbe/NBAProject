@@ -1,4 +1,4 @@
-from basketball_reference_scraper.teams import get_team_stats
+from basketball_reference_scraper.teams import get_team_stats, get_opp_stats
 from TEAM_ABBR import TEAM_TO_TEAM_ABBR
 import connect as conn
 from queries import create_tables, insert_teams, insert_stats, team_stats, team_stats_adv, user_input

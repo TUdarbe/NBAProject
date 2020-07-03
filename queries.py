@@ -165,61 +165,81 @@ def insert_stats(year):
 #         conn.close()
 
 
+#NEED LATER:
+
+    # team_dfs = []
+    # sheets = []
+    #
+    # writer = ExcelWriter("%s-%d_AdvancedStats.xlsx" % (team, year))
+    # team_dfs.append(get_team_misc(team, year).reset_index().transpose())
+    # sheets.append(team)
+    #
+    # for df, sheet in zip(team_dfs, sheets):
+    #     df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=False)
+    #
+    # writer.save()
+
+
 def team_stats(team, year, data_format):
-    team_dfs = []
-    sheets = []
 
     print("Saving into excel sheet... ")
     writer = ExcelWriter("./Excel-Sheets/%s-%d_%s.xlsx" % (team, year, data_format))
-    team_dfs.append(get_team_stats(team, year, data_format).reset_index().transpose())
-    sheets.append(team)
+    team_df = get_team_stats(team, year, data_format).reset_index().transpose()
 
-    for df, sheet in zip(team_dfs, sheets):
-        df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=False)
+    team_df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=True)
 
     writer.save()
 
 
 def team_opp_stats(team, year, data_format):
-    team_dfs = []
-    sheets = []
 
     print("Saving into excel sheet... ")
     writer = ExcelWriter("./Excel-Sheets/%s-%d_OPP-STATS_%s.xlsx" % (team, year, data_format))
-    team_dfs.append(get_team_stats(team, year, data_format).reset_index().transpose())
-    sheets.append(team)
-
-    for df, sheet in zip(team_dfs, sheets):
-        df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=False)
+    team_df = get_team_stats(team, year, data_format).reset_index().transpose()
+    team_df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=True)
 
     writer.save()
 
 
 def roster_list(team, year):
-    team_dfs = []
-    sheets = []
 
     print("Saving into excel sheet... ")
     writer = ExcelWriter("./Excel-Sheets/%s-%d_Roster.xlsx" % (team, year))
-    team_dfs.append(get_roster(team, year).reset_index().transpose())
-    sheets.append(team)
 
-    for df, sheet in zip(team_dfs, sheets):
-        df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=False)
+    team_df = get_roster(team, year)
+    print(team_df)
+
+    team_df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=True)
+
+    writer.save()
+
+
+def roster_stats(team, year, data_format, playoffs):
+
+    print("Saving into excel sheet... ")
+    writer = ExcelWriter("./Excel-Sheets/%s-%d_Roster_Stats_%s.xlsx" % (team, year, data_format))
+    roster_stats_df = get_roster_stats(team, year, data_format, playoffs)
+
+    roster_stats_df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=True)
 
     writer.save()
 
 
 def team_stats_adv(team, year):
-    team_dfs = []
-    sheets = []
 
     writer = ExcelWriter("%s-%d_AdvancedStats.xlsx" % (team, year))
-    team_dfs.append(get_team_misc(team, year).reset_index().transpose())
-    sheets.append(team)
+    team_df = get_team_misc(team, year)
+    team_df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=True)
 
-    for df, sheet in zip(team_dfs, sheets):
-        df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=False)
+    writer.save()
+
+
+def team_misc(team, year):
+    print("Saving into excel sheet... ")
+    writer = ExcelWriter("./Excel-Sheets/%s-%d_MISC_Stats.xlsx" % (team, year))
+    roster_stats_df = get_team_misc(team, year).reset_index().transpose()
+
+    roster_stats_df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=True)
 
     writer.save()
 
@@ -246,7 +266,7 @@ def user_input():
                 print(get_roster(user_team, user_season))
 
         elif user_stats is '2':
-            data_format = input("Enter data format: (TOTAL | PER_GAME | PER_POSS): ")
+            data_format = input("Enter data format: (TOTAL | PER_GAME): ").upper()
 
             if print_or_excel is 'Y' or 'y':
                 team_stats(user_team, user_season, data_format)
@@ -256,7 +276,7 @@ def user_input():
                 print(get_team_stats(user_team, user_season, data_format))
 
         elif user_stats is '3':
-            data_format = input("Enter data format: (TOTAL | PER_GAME | PER_POSS): ")
+            data_format = input("Enter data format: (TOTAL | PER_GAME: ").upper()
 
             if print_or_excel is 'Y' or 'y':
                 team_opp_stats(user_team, user_season, data_format)
@@ -264,3 +284,24 @@ def user_input():
 
             elif print_or_excel is 'N' or 'n':
                 print(get_opp_stats(user_team, user_season, data_format))
+
+        elif user_stats is '4':
+            user_playoffs = input("Would you like playoff roster stats? (Y/N) ")
+            data_format = input("Enter data format: (TOTAL | PER_GAME): ").upper()
+            playoffs = False
+
+            if user_playoffs is 'Y' or 'y':
+                playoffs = True
+            if print_or_excel is 'Y' or 'y':
+                roster_stats(user_team, user_season, data_format, playoffs)
+                print(get_roster_stats(user_team, user_season, data_format, playoffs))
+            elif print_or_excel is 'N' or 'n':
+                print(get_roster_stats(user_team, user_season, data_format, playoffs))
+
+        elif user_stats is '5':
+            if print_or_excel is 'Y' or 'y':
+                team_misc(user_team, user_season)
+                print(get_team_misc(user_team, user_season))
+            elif print_or_excel is 'N' or 'n':
+                print(get_team_misc(user_team, user_season))
+

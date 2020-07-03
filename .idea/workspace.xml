@@ -3,6 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="68777642-97f0-4d8f-b4b3-3e8f06d25e4b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Excel-Sheets/ATL-2016_PER_GAME.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Excel-Sheets/TOR-2019_OPP-STATS_PER_GAME.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/queries.py" beforeDir="false" afterPath="$PROJECT_DIR$/queries.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/teamRequests.py" beforeDir="false" afterPath="$PROJECT_DIR$/teamRequests.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
