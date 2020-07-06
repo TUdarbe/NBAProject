@@ -2,7 +2,9 @@ import psycopg2
 from nba_api.stats.static import players
 from connect import config
 from TEAM_ABBR import TEAM_TO_TEAM_ABBR, TEAM_ABV_DICTIONARY
-from basketball_reference_scraper.teams import get_team_stats, get_team_misc, get_roster, get_roster_stats, get_opp_stats
+from basketball_reference_scraper.teams import get_team_stats, get_team_misc, \
+                                                get_roster, get_roster_stats, get_opp_stats
+from basketball_reference_scraper.players import get_stats, get_game_logs
 from pandas import ExcelWriter
 
 
@@ -244,10 +246,30 @@ def team_misc(team, year):
     writer.save()
 
 
+def player_stats(player, stat_type, playoffs, career):
+    print("Saving into excel sheet... ")
+    writer = ExcelWriter("./Excel-Sheets/%s_STATS.xlsx" % player)
+
+    player_stats_df = get_stats(player, stat_type, playoffs, career)
+
+    player_stats_df.to_excel(writer, sheet_name=player, startrow=0, startcol=0, index=False, header=True)
+
+    writer.save()
+
+def player_game_logs(player, start_date, end_date, playoffs):
+    print("Saving into excel sheet... ")
+    writer = ExcelWriter("./Excel-Sheets/%s_GAME_LOG.xlsx" % player)
+
+    player_game_log_df = get_game_logs(player, start_date, end_date, playoffs)
+    player_game_log_df.to_excel(writer, sheet_name=player, startrow=0, startcol=0, index=False, header=True)
+
+    writer.save()
+
+
 def user_input():
     team_or_player = input("What stats would you like to see: (1)Team or (2)Player ")
 
-    if team_or_player is '1':
+    if team_or_player == '1':
         user_team = input("What team would you like to view? ")
         user_season = int(input("Enter the desired season: "))
 
@@ -256,52 +278,102 @@ def user_input():
                            "3.) Team Opponent Stats\n"
                            "4.) Roster Stats\n"
                            "5.) Misc Stats\n")
-        print_or_excel = input("Would you like to save information in an excel sheet (Y/N)? ")
-        if user_stats is '1':
-            if print_or_excel is 'Y' or 'y':
+
+        print_or_excel = input("Would you like to save information in an excel sheet (Y/N)? ").upper()
+
+        if user_stats == '1':
+
+            if print_or_excel == 'Y':
                 roster_list(user_team, user_season)
-                print(get_roster(user_team, user_season))
-            elif print_or_excel is 'N' or 'n':
+                print("Saved")
 
+            elif print_or_excel == 'N':
                 print(get_roster(user_team, user_season))
 
-        elif user_stats is '2':
+        elif user_stats == '2':
             data_format = input("Enter data format: (TOTAL | PER_GAME): ").upper()
 
-            if print_or_excel is 'Y' or 'y':
+            if print_or_excel == 'Y':
                 team_stats(user_team, user_season, data_format)
                 print(get_team_stats(user_team, user_season, data_format))
 
-            elif print_or_excel is 'N' or 'n':
+            elif print_or_excel == 'N':
                 print(get_team_stats(user_team, user_season, data_format))
 
-        elif user_stats is '3':
+        elif user_stats == '3':
             data_format = input("Enter data format: (TOTAL | PER_GAME: ").upper()
 
-            if print_or_excel is 'Y' or 'y':
+            if print_or_excel == 'Y':
                 team_opp_stats(user_team, user_season, data_format)
                 print(get_opp_stats(user_team, user_season, data_format))
 
-            elif print_or_excel is 'N' or 'n':
+            elif print_or_excel == 'N' or 'n':
                 print(get_opp_stats(user_team, user_season, data_format))
 
-        elif user_stats is '4':
+        elif user_stats == '4':
             user_playoffs = input("Would you like playoff roster stats? (Y/N) ")
             data_format = input("Enter data format: (TOTAL | PER_GAME): ").upper()
             playoffs = False
 
-            if user_playoffs is 'Y' or 'y':
+            if user_playoffs == 'Y':
                 playoffs = True
-            if print_or_excel is 'Y' or 'y':
+            if print_or_excel == 'Y':
                 roster_stats(user_team, user_season, data_format, playoffs)
                 print(get_roster_stats(user_team, user_season, data_format, playoffs))
-            elif print_or_excel is 'N' or 'n':
+            elif print_or_excel == 'N':
                 print(get_roster_stats(user_team, user_season, data_format, playoffs))
 
-        elif user_stats is '5':
-            if print_or_excel is 'Y' or 'y':
+        elif user_stats == '5':
+            if print_or_excel == 'Y':
                 team_misc(user_team, user_season)
                 print(get_team_misc(user_team, user_season))
-            elif print_or_excel is 'N' or 'n':
+            elif print_or_excel == 'N':
                 print(get_team_misc(user_team, user_season))
+
+    elif team_or_player == '2':
+        user_player = input('What player do you like to view? ')
+        print_or_excel = input("Save into excel sheet? (Y/N): ").upper()
+
+        user_stats = input("Enter the number for what stat you would like to see: \n"
+                           "1.) Player Stats\n"
+                           "2.) Game Logs\n")
+        user_playoffs = input("Playoff Stats? (Y/N): ").upper()
+
+        if user_stats == '1':
+            stat_type = input("Enter stat type: (PER_GAME | PER_MINUTE | PER_POSS | ADVANCED): ").upper()
+            user_career = input("Career Stats? (Y/N): ").upper()
+
+            if user_playoffs == 'Y':
+                playoffs = True
+            else:
+                playoffs = False
+
+            if user_career == 'Y':
+                career = True
+            else:
+                career = False
+
+            if print_or_excel == "Y":
+                player_stats(user_player, stat_type, playoffs, career)
+                print(get_stats(user_player, stat_type, playoffs, career))
+            elif print_or_excel == "N":
+                print(get_stats(user_player, stat_type, playoffs, career))
+
+        elif user_stats == '2':
+            user_start_date = input("Enter start date: (YYYY-MM-DD): ").upper()
+            user_end_date = input("Enter end date: (YYYY-MM-DD): ")
+            if user_playoffs == 'Y':
+                playoffs = True
+            else:
+                playoffs = False
+
+            if print_or_excel == "Y":
+                player_game_logs(user_player, user_start_date, user_end_date, playoffs)
+                print(get_game_logs(user_player, user_start_date, user_end_date, playoffs))
+            elif print_or_excel == "N":
+                print(get_game_logs(user_player, user_start_date, user_end_date, playoffs))
+
+
+
+
 
