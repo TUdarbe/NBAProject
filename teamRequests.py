@@ -25,4 +25,3 @@ team_list = []
 # create_tables()
 
 user_input()
-print(get_stats("Kyle Lowry", "PER_GAME", True, True))

@@ -134,7 +134,8 @@ def insert_stats(year):
     writer = ExcelWriter("./Excel-Sheets/NBA-%d_PerGameStats.xlsx" % year)
 
     # for t, a in TEAM_TO_TEAM_ABBR.items():
-    #     team_dfs.append(get_team_stats(a, year, 'PER_GAME'))
+    #     team_dfs.append(get_team_stats(a, year, 'PER_G
+    #     AME'))
 
     for t, a in TEAM_TO_TEAM_ABBR.items():
         team_dfs.append(get_team_stats(a, year, 'PER_GAME').reset_index().transpose())
@@ -188,7 +189,7 @@ def team_stats(team, year, data_format):
     writer = ExcelWriter("./Excel-Sheets/%s-%d_%s.xlsx" % (team, year, data_format))
     team_df = get_team_stats(team, year, data_format).reset_index().transpose()
 
-    team_df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=True)
+    team_df.to_excel(writer, sheet_name=team, startrow=0, startcol=0, index=False, header=False)
 
     writer.save()
 
