@@ -71,14 +71,13 @@ class App extends Component {
   }
 
  
-
   render() {
     return (
       <div>
         <div>
           <Jumbotron className="jumbotron-background">          
               <h1 className="display-3">NBA PROJECT</h1>
-              <p className="lead">Project that displays NBA stats from an excel sheet</p>                    
+              <p className="lead">Project that displays NBA stats from an excel sheet and displays graph</p>                    
               <hr className="my-2" />
               <p>Developed <span className="fa fa-heart"></span> by Troy Udarbe</p>
           </Jumbotron>
