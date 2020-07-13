@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import {OutTable, ExcelRenderer} from 'react-excel-renderer';
 import { Jumbotron, Col, Input, InputGroup, InputGroupAddon, FormGroup, Label, Button, Fade, FormFeedback, Container, Card } from 'reactstrap';
-import {Chart} from 'react-charts';
+import Stats from  './Stats';
 
 class App extends Component {
   constructor(props){
@@ -12,7 +12,8 @@ class App extends Component {
       dataLoaded: false,
       isFormInvalid: false,
       rows: null,
-      cols: null
+      cols: null,
+      chartData: {}
     }
     this.fileHandler = this.fileHandler.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -21,6 +22,7 @@ class App extends Component {
     this.fileInput = React.createRef();
   }
 
+ 
   renderFile = (fileObj) => {
       //just pass the fileObj as parameter
       ExcelRenderer(fileObj, (err, resp) => {
@@ -69,8 +71,9 @@ class App extends Component {
   openFileBrowser = () => {
     this.fileInput.current.click();
   }
+  
 
- 
+
   render() {
     return (
       <div>
@@ -102,7 +105,7 @@ class App extends Component {
             </Col>                                                   
           </FormGroup>   
         </form>
-
+       
         {this.state.dataLoaded && 
         <div>
           <Card body outline color="secondary" className="restrict-card">
@@ -112,9 +115,9 @@ class App extends Component {
           </Card>  
         </div>}
         </Container>
+          <Stats></Stats>
       </div>
-
-      //Div container for graph
+     
     );
   }
 }
