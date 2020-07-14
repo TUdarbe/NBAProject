@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Bar, Line, Pie} from 'react-chartjs-2';
+import {Bar, Line, Pie, Chart} from 'react-chartjs-2';
 
 
 
@@ -51,14 +51,16 @@ import {Bar, Line, Pie} from 'react-chartjs-2';
     render(){
         return(
             
-            <div width="400" height="400">
+            <canvas width="400" height="400">
               <h3>Graph</h3>
-              <Pie 
+              
+              <Chart 
                 data={this.state.data}
+                redraw
                 >
-              </Pie>
+              </Chart>
           
-          </div>
+          </canvas>
         );
         
     }

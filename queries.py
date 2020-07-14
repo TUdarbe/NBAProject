@@ -6,6 +6,8 @@ from basketball_reference_scraper.teams import get_team_stats, get_team_misc, \
                                                 get_roster, get_roster_stats, get_opp_stats
 from basketball_reference_scraper.players import get_stats, get_game_logs
 from pandas import ExcelWriter
+import pandas as pd
+from numpy.random import randint
 
 
 # Function if I want to create tables for database, right now putting data into excel sheets
@@ -249,13 +251,18 @@ def team_misc(team, year):
 
 def player_stats(player, stat_type, playoffs, career):
     print("Saving into excel sheet... ")
-    writer = ExcelWriter("./Excel-Sheets/%s_STATS.xlsx" % player)
+    writer = ExcelWriter("./Excel-Sheets/%s_STATS__%s_REGULAR.xlsx" % (player.upper(), stat_type))
+    sheet_name = player.upper() + "- REGULAR"
+    if playoffs:
+        writer = ExcelWriter("./Excel-Sheets/%s_STATS_%s_PLAYOFFS.xlsx" % (player.upper(), stat_type))
+        sheet_name = player.upper() + "-PLAYOFFS"
 
     player_stats_df = get_stats(player, stat_type, playoffs, career)
 
-    player_stats_df.to_excel(writer, sheet_name=player, startrow=0, startcol=0, index=False, header=True)
+    player_stats_df.to_excel(writer, sheet_name=sheet_name, startrow=0, startcol=0, index=False, header=True)
 
     writer.save()
+
 
 def player_game_logs(player, start_date, end_date, playoffs):
     print("Saving into excel sheet... ")
